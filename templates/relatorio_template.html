@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Servidores</title>
+    <style>
+        body { font-family: sans-serif; font-size: 10pt; }
+        h1, h2 { text-align: center; }
+        h2 { font-size: 1.1em; font-weight: normal; margin-top: -10px; }
+        p.data { text-align: right; font-size: 9pt; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+        th { background-color: #f2f2f2; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <h1>Relatório de Servidores Comissionados</h1>
+    <h2>Secretaria Municipal de Educação de Valença do Piauí</h2>
+    <p class="data">Emitido em: {{ data_emissao }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nº Contrato</th>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Função</th>
+                <th>Lotação</th>
+                <th>Remuneração (R$)</th>
+                <th>Vigência</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servidor in servidores %}
+            <tr>
+                <td>{{ servidor.num_contrato }}</td>
+                <td>{{ servidor.nome }}</td>
+                <td>{{ servidor.cpf }}</td>
+                <td>{{ servidor.funcao or '' }}</td>
+                <td>{{ servidor.lotacao or '' }}</td>
+                <td>{{ '%.2f'|format(servidor.remuneracao)|replace('.', ',') if servidor.remuneracao else 'N/A' }}</td>
+                <td>{{ servidor.vigencia or '' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" style="text-align: center;">Nenhum servidor para exibir.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

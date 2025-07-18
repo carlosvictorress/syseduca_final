@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}SysEduca Web{% endblock %}</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar { background-color: #004d40; }
+        .toast-container { z-index: 1100; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('dashboard') }}"><b>SysEduca</b> Valença-PI</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            {% if session.logged_in %}
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('lista_servidores') }}"><i class="bi bi-people-fill"></i> Servidores</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('bloco_de_notas') }}"><i class="bi bi-journal-richtext"></i> Bloco de Notas</a></li>
+                {% if session.get('role') == 'admin' %}
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('lista_usuarios') }}"><i class="bi bi-person-gear"></i> Usuários</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('ver_logs') }}"><i class="bi bi-journal-text"></i> Logs</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_licenca') }}"><i class="bi bi-key-fill"></i> Licença</a></li>
+                {% endif %}
+            </ul>
+            <div class="d-flex align-items-center">
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-file-earmark-arrow-down-fill"></i> Relatórios
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" href="{{ url_for('gerar_relatorio_html') }}">Relatório HTML</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('gerar_relatorio_pdf') }}">Relatório PDF</a></li>
+                    </ul>
+                </div>
+                <a href="{{ url_for('logout') }}" class="btn btn-danger ms-2"><i class="bi bi-box-arrow-right"></i> Sair</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="toast align-items-center text-white bg-{{ category }} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex"><div class="toast-body">{{ message }}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button></div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<main class="container mt-4">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="text-center text-muted py-4 mt-auto">
+    <p>&copy; {{ current_year }} - Secretaria Municipal de Educação</p>
+</footer>
+
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+        var toastList = toastElList.map(function (toastEl) {
+            var toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+            toast.show();
+            return toast;
+        });
+    });
+</script>
+
+</body>
+</html>

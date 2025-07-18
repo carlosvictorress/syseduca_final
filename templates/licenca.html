@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciamento da Licença{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-key-fill"></i> Gerenciamento da Licença do Sistema</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                Status da Licença Atual
+            </div>
+            <div class="card-body">
+                <p><strong>Data de Expiração:</strong> <span class="fs-5 text-{{ 'success' if licenca and licenca.data_expiracao >= today else 'danger' }}">{{ licenca.data_expiracao.strftime('%d/%m/%Y') if licenca else 'N/A' }}</span></p>
+                <p><strong>Chave de Ativação Atual:</strong></p>
+                <div class="input-group">
+                    <input type="text" class="form-control" value="{{ licenca.chave_licenca if licenca else 'N/A' }}" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                Gerar Nova Licença
+            </div>
+            <div class="card-body">
+                <p>Selecione um período e clique em "Gerar" para criar uma nova chave e atualizar a data de expiração. A nova chave deverá ser enviada ao cliente para reativar o sistema.</p>
+                <form action="{{ url_for('gerar_licenca') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="dias_validade" class="form-label">Período de Validade</label>
+                        <select name="dias_validade" id="dias_validade" class="form-select">
+                            <option value="30" selected>30 Dias (Mensal)</option>
+                            <option value="90">90 Dias (Trimestral)</option>
+                            <option value="180">180 Dias (Semestral)</option>
+                            <option value="365">365 Dias (Anual)</option>
+                        </select>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">Gerar Nova Chave e Renovar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if nova_chave %}
+<div class="alert alert-info mt-4">
+    <h4>Nova Chave de Acesso Gerada!</h4>
+    <p>Envie esta chave para o seu cliente poder reativar o sistema. Ela só pode ser usada uma vez.</p>
+    <div class="input-group">
+        <input type="text" class="form-control fs-4" value="{{ nova_chave }}" readonly>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

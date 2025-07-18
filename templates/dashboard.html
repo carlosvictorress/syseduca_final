@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - SysEduca Web{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+    <span class="text-muted">Visão geral do sistema</span>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary shadow">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-people-fill"></i> Total de Servidores</h5>
+                <p class="card-text fs-2 fw-bold">{{ total_servidores }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success shadow">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-cash-coin"></i> Média Salarial</h5>
+                <p class="card-text fs-2 fw-bold">R$ {{ '%.2f'|format(remuneracao_media)|replace('.', ',') if remuneracao_media else '0,00' }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info shadow">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-briefcase-fill"></i> Total de Funções</h5>
+                <p class="card-text fs-2 fw-bold">{{ funcao_labels|length }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if servidores_incompletos %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card border-danger shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h4><i class="bi bi-exclamation-octagon-fill"></i> Ação Necessária: Cadastros Incompletos</h4>
+            </div>
+            <div class="card-body">
+                <p>Os seguintes servidores foram importados com dados essenciais faltando (CPF, RG ou Endereço). Por favor, clique em um nome para completar o cadastro.</p>
+                <ul class="list-group list-group-flush">
+                    {% for servidor in servidores_incompletos %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('editar_servidor', id=servidor.num_contrato) }}" class="fw-bold text-decoration-none">
+                                {{ servidor.nome }}
+                            </a>
+                            <small class="text-muted ms-2">(Vínculo: {{ servidor.num_contrato }})</small>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5><i class="bi bi-pie-chart-fill"></i> Distribuição por Função</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="funcaoChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5><i class="bi bi-bar-chart-fill"></i> Distribuição por Lotação</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="lotacaoChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h4><i class="bi bi-exclamation-triangle-fill"></i> Contratos com Vencimento Próximo (60 dias)</h4>
+            </div>
+            <div class="card-body">
+                {% if contratos_a_vencer %}
+                <ul class="list-group list-group-flush">
+                    {% for servidor in contratos_a_vencer %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <a href="{{ url_for('editar_servidor', id=servidor.num_contrato) }}" class="fw-bold">{{ servidor.nome }}</a> ({{ servidor.funcao }})
+                            </div>
+                            <span class="badge bg-danger rounded-pill">
+                                Vence em: {{ servidor.data_saida.strftime('%d/%m/%Y') }}
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted mb-0">Nenhum contrato vencendo nos próximos 60 dias.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Gráfico de Pizza para Funções
+    const ctxFuncao = document.getElementById('funcaoChart');
+    new Chart(ctxFuncao, {
+        type: 'doughnut',
+        data: {
+            labels: {{ funcao_labels|tojson }},
+            datasets: [{
+                label: 'Nº de Servidores',
+                data: {{ funcao_data|tojson }},
+                backgroundColor: [
+                    '#0d6efd', '#6c757d', '#198754', '#dc3545', '#ffc107', '#0dcaf0',
+                    '#fd7e14', '#6610f2', '#20c997', '#212529'
+                ],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            }
+        }
+    });
+
+    // Gráfico de Barras para Lotações
+    const ctxLotacao = document.getElementById('lotacaoChart');
+    new Chart(ctxLotacao, {
+        type: 'bar',
+        data: {
+            labels: {{ lotacao_labels|tojson }},
+            datasets: [{
+                label: 'Nº de Servidores',
+                data: {{ lotacao_data|tojson }},
+                backgroundColor: 'rgba(0, 77, 64, 0.6)',
+                borderColor: 'rgba(0, 77, 64, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

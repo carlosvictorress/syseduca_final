@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Servidor{% endblock %}
+
+{% block content %}
+<h2>Editar Servidor: {{ servidor.nome }}</h2>
+<hr>
+
+<form action="{{ url_for('editar_servidor', id=servidor.num_contrato) }}" method="POST" enctype="multipart/form-data">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="nome" class="form-label">Nome Completo*</label>
+            <input type="text" class="form-control" id="nome" name="nome" value="{{ servidor.nome }}" required>
+        </div>
+        <div class="col-md-3">
+            <label for="cpf" class="form-label">CPF</label>
+            <input type="text" class="form-control" id="cpf" name="cpf" value="{{ servidor.cpf or '' }}">
+        </div>
+        <div class="col-md-3">
+            <label for="rg" class="form-label">RG</label>
+            <input type="text" class="form-control" id="rg" name="rg" value="{{ servidor.rg or '' }}">
+        </div>
+    </div>
+    
+    <div class="row mb-3">
+        <div class="col-md-3"><label for="nacionalidade" class="form-label">Nacionalidade</label><input type="text" class="form-control" id="nacionalidade" name="nacionalidade" value="{{ servidor.nacionalidade or 'brasileira' }}"></div>
+        <div class="col-md-3"><label for="estado_civil" class="form-label">Estado Civil</label><input type="text" class="form-control" id="estado_civil" name="estado_civil" value="{{ servidor.estado_civil or 'solteiro(a)' }}"></div>
+        <div class="col-md-3"><label for="telefone" class="form-label">Telefone</label><input type="text" class="form-control" id="telefone" name="telefone" value="{{ servidor.telefone or '' }}"></div>
+        <div class="col-md-3"><label for="num_contrato" class="form-label">Nº do Vínculo*</label><input type="text" class="form-control" id="num_contrato" name="num_contrato" value="{{ servidor.num_contrato }}" readonly></div>
+    </div>
+    <div class="row mb-3"><div class="col-md-12"><label for="endereco" class="form-label">Endereço Completo</label><input type="text" class="form-control" id="endereco" name="endereco" value="{{ servidor.endereco or '' }}"></div></div>
+    <hr>
+    <div class="row mb-3">
+        <div class="col-md-4"><label for="funcao" class="form-label">Função</label><input type="text" class="form-control" id="funcao" name="funcao" value="{{ servidor.funcao or '' }}"></div>
+        <div class="col-md-4"><label for="lotacao" class="form-label">Lotação</label><input type="text" class="form-control" id="lotacao" name="lotacao" value="{{ servidor.lotacao or '' }}"></div>
+        <div class="col-md-4"><label for="carga_horaria" class="form-label">Carga Horária Semanal</label><input type="text" class="form-control" id="carga_horaria" name="carga_horaria" value="{{ servidor.carga_horaria or '40' }}"></div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-4"><label for="remuneracao" class="form-label">Remuneração (R$)</label><input type="text" class="form-control" id="remuneracao" name="remuneracao" value="{{ '%.2f'|format(servidor.remuneracao)|replace('.', ',') if servidor.remuneracao else '' }}"></div>
+        <div class="col-md-4"><label for="data_inicio" class="form-label">Data de Início</label><input type="date" class="form-control" id="data_inicio" name="data_inicio" value="{{ servidor.data_inicio.strftime('%Y-%m-%d') if servidor.data_inicio else '' }}"></div>
+        <div class="col-md-4"><label for="data_saida" class="form-label">Data de Término</label><input type="date" class="form-control" id="data_saida" name="data_saida" value="{{ servidor.data_saida.strftime('%Y-%m-%d') if servidor.data_saida else '' }}"></div>
+    </div>
+    <div class="row mb-3"><div class="col-md-12"><label for="dados_bancarios" class="form-label">Dados Bancários</label><input type="text" class="form-control" id="dados_bancarios" name="dados_bancarios" value="{{ servidor.dados_bancarios or '' }}"></div></div>
+    
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <label for="observacoes" class="form-label">Observações</label>
+            <textarea class="form-control" name="observacoes" id="observacoes" rows="4">{{ servidor.observacoes or '' }}</textarea>
+        </div>
+        <div class="col-md-4">
+            <p class="mb-1">Foto Atual:</p>
+            {% if servidor.foto_filename %}
+                <img src="{{ url_for('uploaded_file', filename=servidor.foto_filename) }}" alt="Foto de {{ servidor.nome }}" class="img-thumbnail mb-2" style="max-width: 150px;">
+            {% else %}
+                <img src="{{ url_for('static', filename='placeholder.png') }}" alt="Foto padrão" class="img-thumbnail mb-2" style="max-width: 150px;">
+            {% endif %}
+            <label for="foto" class="form-label">Trocar Foto</label>
+            <input type="file" class="form-control" name="foto" id="foto">
+        </div>
+    </div>
+
+    <a href="{{ url_for('lista_servidores') }}" class="btn btn-secondary">Cancelar</a>
+    <button type="submit" class="btn btn-primary">Salvar Alterações do Servidor</button>
+</form>
+
+<hr class="my-5">
+
+<h3 class="mb-3"><i class="bi bi-paperclip"></i> Gerenciamento de Documentos</h3>
+<div class="card shadow-sm">
+    <div class="card-header">
+        Anexar Novo Documento
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for('upload_documento', servidor_id=servidor.num_contrato) }}" method="POST" enctype="multipart/form-data">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label for="descricao" class="form-label">Descrição do Documento*</label>
+                    <input type="text" class="form-control" name="descricao" id="descricao" placeholder="Ex: Cópia do RG, Comprovante de Residência..." required>
+                </div>
+                <div class="col-md-5">
+                    <label for="documento" class="form-label">Arquivo* (PDF, JPG, PNG)</label>
+                    <input type="file" class="form-control" name="documento" id="documento" required>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100"><i class="bi bi-upload"></i> Anexar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="card-footer">
+        <h6>Documentos Anexados:</h6>
+        {% if servidor.documentos %}
+            <ul class="list-group list-group-flush">
+                {% for doc in servidor.documentos %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-file-earmark-text"></i>
+                        <strong>{{ doc.description }}</strong>
+                        <br>
+                        <small class="text-muted">Enviado em: {{ doc.upload_date.strftime('%d/%m/%Y') }}</small>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('download_documento', documento_id=doc.id) }}" class="btn btn-primary btn-sm" target="_blank">
+                            <i class="bi bi-download"></i> Baixar
+                        </a>
+                        {% if session.get('role') == 'admin' %}
+                        <a href="{{ url_for('delete_documento', documento_id=doc.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este documento?');">
+                            <i class="bi bi-trash-fill"></i> Excluir
+                        </a>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted mb-0">Nenhum documento anexado para este servidor.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

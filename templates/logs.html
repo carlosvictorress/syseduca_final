@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Logs do Sistema{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-journal-text"></i> Logs de Atividade do Sistema</h2>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover table-bordered align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th style="width: 20%;">Data e Hora</th>
+                <th style="width: 15%;">Usuário</th>
+                <th style="width: 55%;">Ação Realizada</th>
+                <th style="width: 10%;">Endereço IP</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs.items %}
+            <tr>
+                <td>{{ log.timestamp.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                <td>{{ log.username }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.ip_address }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center">Nenhuma atividade registrada ainda.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if logs.pages > 1 %}
+<nav aria-label="Navegação dos logs">
+    <ul class="pagination justify-content-center">
+        <li class="page-item {% if not logs.has_prev %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('ver_logs', page=logs.prev_num) if logs.has_prev else '#' }}">Anterior</a>
+        </li>
+
+        {% for page_num in logs.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if page_num %}
+                <li class="page-item {% if logs.page == page_num %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('ver_logs', page=page_num) }}">{{ page_num }}</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+        {% endfor %}
+
+        <li class="page-item {% if not logs.has_next %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('ver_logs', page=logs.next_num) if logs.has_next else '#' }}">Próximo</a>
+        </li>
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

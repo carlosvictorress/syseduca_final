@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Renovar Licença{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Licença Expirada</h4>
+            </div>
+            <div class="card-body">
+                <p>O acesso ao sistema foi bloqueado pois sua licença de uso expirou.</p>
+                <p>Para desbloquear, por favor, insira a chave de renovação fornecida pelo administrador do sistema após a confirmação do pagamento.</p>
+                <form action="{{ url_for('renovar_licenca') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="renewal_key" class="form-label"><strong>Chave de Renovação</strong></label>
+                        <input type="text" class="form-control form-control-lg" id="renewal_key" name="renewal_key" required autocomplete="off">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">Ativar Sistema</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-muted">
+                <small>Em caso de dúvidas ou para realizar o pagamento, entre em contato com o suporte técnico.</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

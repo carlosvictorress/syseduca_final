@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Instâncias e bancos de dados locais
+/instance/
+*.sqlite
+*.db
+servidores.db
+
+# Arquivos de ambiente virtual
+venv/
+.env
+
+# Arquivos de upload
+/uploads/

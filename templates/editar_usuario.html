@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Usuário{% endblock %}
+
+{% block content %}
+<h2>Editar Usuário: {{ user.username }}</h2>
+<hr>
+
+<div class="card">
+    <div class="card-body">
+        <form action="{{ url_for('editar_usuario', id=user.id) }}" method="POST">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="username" class="form-label">Nome de Usuário</label>
+                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="role" class="form-label">Papel</label>
+                    <select name="role" id="role" class="form-select">
+                        <option value="operador" {% if user.role == 'operador' %}selected{% endif %}>Operador</option>
+                        <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Administrador</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Nova Senha</label>
+                <input type="password" class="form-control" id="password" name="password">
+                <div class="form-text">Deixe em branco para não alterar a senha atual.</div>
+            </div>
+            <a href="{{ url_for('lista_usuarios') }}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

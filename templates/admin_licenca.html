@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciar Licença do Sistema{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-key-fill"></i> Gerenciamento de Licença</h2>
+<hr>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">Status da Licença</h5>
+    </div>
+    <div class="card-body">
+        <p>A licença atual do sistema expira em: 
+            <strong class="fs-5">{{ licenca.expiration_date.strftime('%d/%m/%Y às %H:%M') }}</strong>
+        </p>
+
+        {% if licenca.renewal_key %}
+            <div class="alert alert-info">
+                <p class="mb-1"><strong>Chave de Renovação Ativa (para o cliente):</strong></p>
+                <p class="fs-4 user-select-all bg-light p-2 rounded"><code>{{ licenca.renewal_key }}</code></p>
+                <small>Forneça esta chave ao cliente para que ele possa renovar a assinatura. Ela só pode ser usada uma vez.</small>
+            </div>
+        {% else %}
+             <div class="alert alert-secondary">
+                <p class="mb-0">Nenhuma chave de renovação ativa no momento. Clique no botão abaixo para gerar uma.</p>
+            </div>
+        {% endif %}
+
+        <form action="{{ url_for('admin_licenca') }}" method="POST" onsubmit="return confirm('Tem certeza que deseja gerar uma nova chave? A chave antiga, se houver, será substituída.');">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-arrow-clockwise"></i> Gerar Nova Chave de Renovação</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
