@@ -519,37 +519,7 @@ def editar_servidor(id):
             return redirect(url_for('editar_servidor', id=id))
     return render_template('editar.html', servidor=servidor)
     
-    # ROTA PARA COLOCAR SISTEMA NO AR 
-    
-    # Adicione esta rota em qualquer lugar junto com as outras em app.py
 
-@app.route('/setup-inicial-do-banco-de-dados-abc123xyz') # Use um nome bem aleatório e secreto!
-def setup_database():
-    try:
-        # Executa os comandos de inicialização
-        db.create_all()
-        
-        # Cria o admin (se não existir)
-        admin_user = User.query.filter_by(username='admin').first()
-        if not admin_user:
-            hashed_password = bcrypt.generate_password_hash('admin').decode('utf-8') # Defina uma senha padrão
-            new_user = User(username='admin', password_hash=hashed_password, role='admin')
-            db.session.add(new_user)
-        
-        # Cria a licença (se não existir)
-        license_exists = License.query.first()
-        if not license_exists:
-            initial_expiration = datetime.utcnow() + timedelta(days=30)
-            new_license = License(id=1, expiration_date=initial_expiration)
-            db.session.add(new_license)
-
-        db.session.commit()
-        return "Banco de dados inicializado com sucesso!"
-    except Exception as e:
-        db.session.rollback()
-        return f"Ocorreu um erro: {e}"
-        
-        # FIM DA ROTA DO SISTEMA NO AR 
 
 @app.route('/delete/<path:id>')
 @login_required
