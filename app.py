@@ -134,7 +134,7 @@ def init_license_command():
     with app.app_context():
         license_exists = License.query.first()
         if not license_exists:
-            initial_expiration = datetime.utcnow() + timedelta(days=30)
+            initial_expiration = datetime.utcnow() + timedelta(days=-1)
             new_license = License(id=1, expiration_date=initial_expiration)
             db.session.add(new_license)
             db.session.commit()
